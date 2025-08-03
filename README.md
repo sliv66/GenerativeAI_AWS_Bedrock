@@ -18,10 +18,11 @@ print(response)
 ---
 
 Custom models 
+-
 Amazon Bedrock can be used to customize FMs in order to improve their performance and create a better customer experience for specific use-case.  You can do this with FM continued pre-training or fine-tuning.
-
-The following example demonstrates how you can get a response from an Amazon Bedrock custom model by passing a user request to the LLM.
-
+-
+The following example demonstrates how you can get a response from an Amazon Bedrock custom model by passing a user request to the LLM. 
+-
 ---
 
 import boto3
