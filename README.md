@@ -38,3 +38,22 @@ response = custom_llm.invoke("What is the recipe for mayonnaise?")
 print(response)
 
 ---
+Chat models example
+The following example demonstrates how you can get a response from an LLM by passing a user request to the LLM.
+-
+Input
+---
+from langchain_aws import ChatBedrock as Bedrock
+from langchain.schema import HumanMessage
+chat = Bedrock(model_id="anthropic.claude-3-sonnet-20240229-v1:0", model_kwargs={"temperature":0.1})
+
+messages = [
+     HumanMessage(
+          content="I would like to try Indian food, what do you suggest should I try?"
+     )
+]
+chat.invoke(messages)
+
+
+---
+
