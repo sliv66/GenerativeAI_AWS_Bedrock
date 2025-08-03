@@ -23,9 +23,9 @@ Amazon Bedrock can be used to customize FMs in order to improve their performanc
 The following example demonstrates how you can get a response from an Amazon Bedrock custom model by passing a user request to the LLM.
 
 ---
+
 import boto3
 from langchain_aws import BedrockLLM
-
 custom_llm = BedrockLLM(
   credentials_profile_name = "bedrock-admin",
   provider = "cohere",
@@ -35,4 +35,5 @@ custom_llm = BedrockLLM(
 )
 response = custom_llm.invoke("What is the recipe for mayonnaise?")
 print(response)
+
 ---
