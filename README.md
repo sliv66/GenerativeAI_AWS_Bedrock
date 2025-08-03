@@ -94,3 +94,74 @@ prompt = multi_var_prompt.format(customerName="John Doe",
 
 ---
 
+Agent example
+The following example demonstrates how to initialize an Agent, Tool, and LLM to form a chain and have the ZERO_SHOT ReAct agent call the in-built tool LLMMathChain to do math calculations separately and pass the result to the LLM for the final response.
+---
+from langchain.agents import load_tools
+from langchain.agents import initialize_agent, Tool
+from langchain.agents import AgentType
+from langchain import LLMMathChain
+from langchain_aws import ChatBedrock
+from langchain.agents import AgentExecutor, create_react_agent
+
+chat = ChatBedrock(model_id="anthropic.claude-3-sonnet-20240229-v1:0", model_kwargs={"temperature":0.1})
+
+prompt_template = """Answer the following questions as best you can.
+You have access to the following tools:\n\n{tools}\n\n
+Use the following format:\n\nQuestion: the input question you must answer\n
+Thought: you should always think about what to do\n
+Action: the action to take, should be one of [{tool_names}]\n
+Action Input: the input to the action\nObservation: the result of the action\n...
+(this Thought/Action/Action Input/Observation can repeat N times)\n
+Thought: I now know the final answer\n
+Final Answer: the final answer to the original input question\n\nBegin!\n\n
+Question: {input}\nThought:{agent_scratchpad}
+"""
+modelId = "anthropic.claude-3-sonnet-20240229-v1:0"
+
+react_agent_llm = ChatBedrock(model_id=modelId, client=bedrock_client)
+math_chain_llm = ChatBedrock(model_id=modelId, client=bedrock_client)
+
+tools = load_tools([], llm=react_agent_llm)
+
+llm_math_chain = LLMMathChain.from_llm(llm=math_chain_llm, verbose=True)
+
+llm_math_chain.llm_chain.prompt.template = """Human: Given a question with a math problem, provide only a single line mathematical expression that solves the problem in the following format. Don't solve the expression only create a parsable expression.
+```text
+{{single line mathematical expression that solves the problem}}
+```
+
+Assistant:
+Here is an example response with a single line mathematical expression for solving a math problem:
+```text
+37593**(1/5)
+```
+
+Human: {question}
+Assistant:"""
+
+tools.append(
+    Tool.from_function(
+         func=llm_math_chain.(opens in a new tab)run(opens in a new tab),
+         name="Calculator",
+         description="Useful for when you need to answer questions about math.",
+    )
+)
+
+react_agent = create_react_agent(react_agent_llm,
+    tools,
+    PromptTemplate.from_template(prompt_template)
+         # max_iteration=2,
+         # return_intermediate_steps=True,
+         # handle_parsing_errors=True,
+    )
+
+agent_executor = AgentExecutor(
+agent=react_agent,
+tools=tools,
+verbose=True,
+handle_parsing_errors=True,
+max_iterations = 10 # useful when agent is stuck in a loop
+)
+
+agent_executor.invoke({"input": "What is the distance between San Francisco and Los Angeles? If I travel from San Francisco to Los Angeles with the speed of 40MPH how long will it take to reach?"})
