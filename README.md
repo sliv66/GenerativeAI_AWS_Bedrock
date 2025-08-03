@@ -54,6 +54,16 @@ messages = [
 ]
 chat.invoke(messages)
 
-
 ---
+Embedding example 
+The following example demonstrates how to call a BedrockEmbeddings client to send text to the Amazon Titan Embeddings model to get embeddings as a response.
+---
+from langchain_community.embeddings import BedrockEmbeddings
+
+embeddings = BedrockEmbeddings(
+    region_name="us-east-1",
+    model_id="amazon.titan-embed-text-v1"
+)
+
+embeddings.embed_query("Cooper is a puppy that likes to eat beef")
 
